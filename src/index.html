@@ -3,10 +3,63 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>BigStinky.com</title>
+    <title>Welcome</title>
+    <link rel="stylesheet" href="./index.css" />
   </head>
   <body>
-    <nav></nav>
-    <div id="root"></div>
+    <!-- Landing page content - shown when not authenticated -->
+    <div id="landing-page" class="landing-page">
+      <nav class="landing-page__navbar">
+        <a href="/" class="landing-page__logo">Your Site</a>
+        <div class="landing-page__nav-links">
+          <a href="#features">Features</a>
+          <a href="#about">About</a>
+          <a href="/login" class="landing-page__login-btn">Login</a>
+        </div>
+      </nav>
+      <section class="landing-page__hero">
+        <h1>Welcome to Your Site</h1>
+        <p>
+          A brief description of what makes your site special and why visitors
+          should be interested.
+        </p>
+        <a href="/login" class="landing-page__login-btn">Get Started</a>
+      </section>
+      <section id="features" class="landing-page__content-section">
+        <div class="landing-page__features">
+          <div class="landing-page__feature-card">
+            <h3>Feature One</h3>
+            <p>
+              Description of your first main feature and why it's valuable to
+              users.
+            </p>
+          </div>
+          <div class="landing-page__feature-card">
+            <h3>Feature Two</h3>
+            <p>
+              Description of your second feature and its benefits to your users.
+            </p>
+          </div>
+          <div class="landing-page__feature-card">
+            <h3>Feature Three</h3>
+            <p>Description of your third feature and what makes it special.</p>
+          </div>
+        </div>
+      </section>
+      <section id="about" class="landing-page__content-section">
+        <h2>About Us</h2>
+        <p>
+          Share your story, mission, or any other relevant information about
+          your site and team here.
+        </p>
+      </section>
+    </div>
+
+    <!-- App content - shown when authenticated -->
+    <div id="app" class="app" style="display: none">
+      <!-- This will contain your authenticated app content -->
+    </div>
+
+    <script src="./index.js"></script>
   </body>
 </html>
