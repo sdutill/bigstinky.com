@@ -4,9 +4,194 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>BigStinky.com</title>
+    <style>
+      body {
+        margin: 0;
+        overflow: hidden;
+        background-color: #fff;
+      }
+
+      .bouncing-text {
+        position: absolute;
+        font-size: 48px;
+        font-weight: bold;
+        user-select: none;
+        transition: transform 0.2s;
+      }
+
+      .corner-hit {
+        transform: scale(1.5);
+      }
+    </style>
   </head>
   <body>
     <nav></nav>
     <div id="root"></div>
+
+    <script>
+      // Configuration object
+      const config = {
+        cornerThreshold: 20,
+        baseSpeed: { min: 2, max: 4 },
+        rotationSpeed: { min: 1, max: 3 },
+        brownRange: {
+          red: { min: 90, max: 139 },
+          greenRatio: { min: 0.2, max: 0.6 },
+          blueRatio: { min: 0.2, max: 0.6 },
+        },
+      };
+
+      // Utility functions
+      const utils = {
+        getRandomBrown() {
+          const r = Math.floor(
+            Math.random() *
+              (config.brownRange.red.max - config.brownRange.red.min) +
+              config.brownRange.red.min
+          );
+          const g = Math.floor(
+            r *
+              (Math.random() *
+                (config.brownRange.greenRatio.max -
+                  config.brownRange.greenRatio.min) +
+                config.brownRange.greenRatio.min)
+          );
+          const b = Math.floor(
+            g *
+              (Math.random() *
+                (config.brownRange.blueRatio.max -
+                  config.brownRange.blueRatio.min) +
+                config.brownRange.blueRatio.min)
+          );
+          return `rgb(${r}, ${g}, ${b})`;
+        },
+
+        getRandomSpeed() {
+          return (
+            (Math.random() * (config.baseSpeed.max - config.baseSpeed.min) +
+              config.baseSpeed.min) *
+            (Math.random() < 0.5 ? 1 : -1)
+          );
+        },
+
+        getRandomRotation() {
+          return (
+            (Math.random() *
+              (config.rotationSpeed.max - config.rotationSpeed.min) +
+              config.rotationSpeed.min) *
+            (Math.random() < 0.5 ? 1 : -1)
+          );
+        },
+      };
+
+      class BouncingText {
+        constructor(text, index) {
+          this.createDOMElement(text, index);
+          this.initializeProperties();
+        }
+
+        createDOMElement(text, index) {
+          this.element = document.createElement("div");
+          this.element.className = "bouncing-text";
+          this.element.textContent = text;
+          this.element.style.left = `${
+            Math.random() * (window.innerWidth - 200)
+          }px`;
+          this.element.style.top = `${
+            Math.random() * (window.innerHeight - 200)
+          }px`;
+          document.getElementById("root").appendChild(this.element);
+        }
+
+        initializeProperties() {
+          const rect = this.element.getBoundingClientRect();
+          this.x = parseInt(this.element.style.left);
+          this.y = parseInt(this.element.style.top);
+          this.dx = utils.getRandomSpeed();
+          this.dy = utils.getRandomSpeed();
+          this.rotation = 0;
+          this.rotationSpeed = utils.getRandomRotation();
+          this.element.style.color = utils.getRandomBrown();
+        }
+
+        checkCornerCollision(rect) {
+          const rightEdge = window.innerWidth - rect.width;
+          const bottomEdge = window.innerHeight - rect.height;
+
+          const topLeft =
+            this.x < config.cornerThreshold && this.y < config.cornerThreshold;
+          const topRight =
+            this.x > rightEdge - config.cornerThreshold &&
+            this.y < config.cornerThreshold;
+          const bottomLeft =
+            this.x < config.cornerThreshold &&
+            this.y > bottomEdge - config.cornerThreshold;
+          const bottomRight =
+            this.x > rightEdge - config.cornerThreshold &&
+            this.y > bottomEdge - config.cornerThreshold;
+
+          return topLeft || topRight || bottomLeft || bottomRight;
+        }
+
+        onCornerHit() {
+          this.element.style.color = utils.getRandomBrown();
+          this.dx = utils.getRandomSpeed();
+          this.dy = utils.getRandomSpeed();
+          this.rotationSpeed = utils.getRandomRotation();
+
+          this.element.classList.add("corner-hit");
+          setTimeout(() => {
+            this.element.classList.remove("corner-hit");
+          }, 200);
+        }
+
+        update() {
+          const rect = this.element.getBoundingClientRect();
+
+          if (this.checkCornerCollision(rect)) {
+            this.onCornerHit();
+          } else {
+            if (this.x + rect.width > window.innerWidth || this.x < 0)
+              this.dx = -this.dx;
+            if (this.y + rect.height > window.innerHeight || this.y < 0)
+              this.dy = -this.dy;
+          }
+
+          this.x += this.dx;
+          this.y += this.dy;
+          this.rotation += this.rotationSpeed;
+
+          this.element.style.left = `${this.x}px`;
+          this.element.style.top = `${this.y}px`;
+          this.element.style.transform = `rotate(${this.rotation}deg)`;
+        }
+      }
+
+      class BouncingTextManager {
+        constructor(texts) {
+          this.bouncingTexts = texts.map(
+            (text, index) => new BouncingText(text, index)
+          );
+          this.animate = this.animate.bind(this);
+        }
+
+        animate() {
+          this.bouncingTexts.forEach((text) => text.update());
+          requestAnimationFrame(this.animate);
+        }
+      }
+
+      // Initialize with array of texts
+      const textArray = [
+        "Pood...",
+        "Fard!",
+        "Stinky",
+        "Shiddd",
+        "Crapola",
+        "Diarear",
+      ];
+      const manager = new BouncingTextManager(textArray);
+      manager.animate();
+    </script>
   </body>
 </html>
